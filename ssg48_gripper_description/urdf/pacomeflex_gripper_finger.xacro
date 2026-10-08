@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+  Pacomeflex custom fingertips for the SSG48 gripper.
+  Left and right fingers are NOT symmetric: each side has its own STL,
+  selected through the 'mesh' parameter at instantiation.
+
+  mesh_scale: unit conversion applied to the STL. CAD packages typically
+  export STL in millimeters while URDF expects meters, hence the default
+  of 0.001. Set to '1 1 1' if the mesh is re-exported directly in meters.
+
+  mesh_xyz / mesh_rpy: correction transform applied to the STL before it is
+  placed in the link frame. Use these to compensate for the CAD export
+  coordinate system until the meshes are re-exported in the link frame,
+  at which point both should return to "0 0 0".
+
+  Author: Lionel Birglen
+-->
+<robot name="pacomeflex_gripper_finger" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="pacomeflex_gripper_finger"
+    params="finger_prefix parent_link *origin
+            mesh:=package://ssg48_gripper_description/meshes/pacomeflex_gripper_finger_left.STL
+            mesh_scale:='0.001 0.001 0.001'
+            mesh_xyz:='0 0 0'
+            mesh_rpy:='0 0 0'">
+
+    <link name="${finger_prefix}gripper_finger">
+
+      <!-- TODO: replace mass, COM origin, and inertia tensor with the values
+           from CAD mass properties, expressed in the link frame.
+           Current values are copied from the stock standard finger as a
+           placeholder of the right order of magnitude. -->
+      <inertial>
+        <origin xyz="0 0.0062 0.011" rpy="0 0 0" />
+        <mass value="0.011" />
+        <inertia
+          ixx="1.45e-06" ixy="0.0"      ixz="0.0"
+          iyy="1.61e-06" iyz="-3.6e-07"
+          izz="1.32e-06" />
+      </inertial>
+
+      <visual>
+        <origin xyz="${mesh_xyz}" rpy="${mesh_rpy}" />
+        <geometry>
+          <mesh filename="${mesh}" />
+        </geometry>
+        <material name="">
+          <color rgba="0.80 0.33 0.10 1" />
+        </material>
+      </visual>
+
+      <!-- TODO: once the geometry is settled, replace the collision mesh by a
+           simplified primitive (box/cylinder) or a convex hull for faster,
+           more robust MoveIt collision checking, e.g.:
+           <origin xyz="0 0.006 0.02" rpy="0 0 0" />
+           <geometry><box size="0.012 0.014 0.045" /></geometry>            -->
+      <collision>
+        <origin xyz="${mesh_xyz}" rpy="${mesh_rpy}" />
+        <geometry>
+          <mesh filename="${mesh}" />
+        </geometry>
+      </collision>
+
+    </link>
+
+    <joint name="${finger_prefix}gripper_finger_interface" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent_link}" />
+      <child link="${finger_prefix}gripper_finger" />
+    </joint>
+
+  </xacro:macro>
+</robot>

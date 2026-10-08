@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot name="standard_gripper_finger" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="standard_gripper_finger" params="finger_prefix parent_link *origin" >
+
+  <link
+    name="${finger_prefix}gripper_finger">
+    <inertial>
+      <origin
+        xyz="-1.3878E-17 0.0062414 0.011011"
+        rpy="0 0 0" />
+      <mass
+        value="0.01097" />
+      <inertia
+        ixx="1.4481E-06"
+        ixy="1.438E-22"
+        ixz="8.81E-22"
+        iyy="1.6085E-06"
+        iyz="-3.5645E-07"
+        izz="1.3235E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ssg48_gripper_description/meshes/standard_gripper_finger_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://ssg48_gripper_description/meshes/standard_gripper_finger_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="${finger_prefix}gripper_finger_interface" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent_link}" />
+      <child link="${finger_prefix}gripper_finger" />
+      <!-- <origin xyz="0 0 0" rpy="0 0 0" /> -->
+    </joint>
+
+  </xacro:macro>
+</robot>

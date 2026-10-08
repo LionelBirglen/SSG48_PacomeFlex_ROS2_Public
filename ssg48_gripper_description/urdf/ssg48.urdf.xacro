@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Top-level SSG48 gripper description.
+
+  Finger variant is selected with the 'finger_type' argument:
+      finger_type:=standard    stock rigid fingers          (TCP 0.031 m)
+      finger_type:=adaptive    stock adaptive fingers       (TCP 0.070 m)
+      finger_type:=pacomeflex  custom pacomeflex fingers    (TCP: TODO, set below)
+  Replaces the former boolean 'standard_fingers' argument.
+
+  Example:
+      xacro ssg48.urdf.xacro finger_type:=pacomeflex
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="gripper">
+
+    <link name="world" />
+
+    <xacro:arg name="finger_type" default="pacomeflex" />
+    <xacro:property name="finger_type" value="$(arg finger_type)" />
+
+    <xacro:include filename="ssg48_gripper.xacro" />
+
+    <!-- ================= standard stock fingers ================= -->
+    <xacro:if value="${finger_type == 'standard'}">
+
+        <xacro:ssg48_gripper prefix="" parent_link="world" gripper_finger_tcp="0.031">
+            <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        </xacro:ssg48_gripper>
+
+        <xacro:include filename="standard_gripper_finger.xacro" />
+
+        <xacro:standard_gripper_finger finger_prefix="left_" parent_link="left_gripper_finger_link">
+            <origin xyz="0.0 0.0 0.0" rpy="0 0 -1.57"/>
+        </xacro:standard_gripper_finger>
+
+        <xacro:standard_gripper_finger finger_prefix="right_" parent_link="right_gripper_finger_link">
+            <origin xyz="0.0 0.0 0.0" rpy="0 0 1.57"/>
+        </xacro:standard_gripper_finger>
+
+    </xacro:if>
+
+    <!-- ================= adaptive stock fingers ================= -->
+    <xacro:if value="${finger_type == 'adaptive'}">
+
+        <xacro:ssg48_gripper prefix="" parent_link="world" gripper_finger_tcp="0.070">
+            <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        </xacro:ssg48_gripper>
+
+        <xacro:include filename="adaptive_gripper_finger.xacro" />
+
+        <xacro:adaptive_gripper_finger finger_prefix="left_" parent_link="left_gripper_finger_link">
+            <origin xyz="0.0 0.0 0.0" rpy="0 -1.57 -3.14"/>
+        </xacro:adaptive_gripper_finger>
+
+        <xacro:adaptive_gripper_finger finger_prefix="right_" parent_link="right_gripper_finger_link">
+            <origin xyz="0.0 0.0 0.0" rpy="0 -1.57 0"/>
+        </xacro:adaptive_gripper_finger>
+
+    </xacro:if>
+
+    <!-- ================= pacomeflex custom fingers ================= -->
+    <!-- Left and right fingers are asymmetric: each side receives its own STL. -->
+    <xacro:if value="${finger_type == 'pacomeflex'}">
+
+        <!-- TODO: set gripper_finger_tcp to the pacomeflex fingertip length
+             (only takes effect once the gripper_tcp_link block is
+             uncommented in ssg48_gripper.xacro). -->
+        <xacro:ssg48_gripper prefix="" parent_link="world" gripper_finger_tcp="0.031">
+            <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        </xacro:ssg48_gripper>
+
+        <xacro:include filename="pacomeflex_gripper_finger.xacro" />
+
+        <xacro:pacomeflex_gripper_finger finger_prefix="left_"
+            parent_link="left_gripper_finger_link"
+            mesh="package://ssg48_gripper_description/meshes/pacomeflex_gripper_finger_left.STL">
+            <origin xyz="-0.039 -0.05 -0.073" rpy="1.57 0 1.57"/>
+        </xacro:pacomeflex_gripper_finger>
+
+        <xacro:pacomeflex_gripper_finger finger_prefix="right_"
+            parent_link="right_gripper_finger_link"
+            mesh="package://ssg48_gripper_description/meshes/pacomeflex_gripper_finger_right.STL">
+            <origin xyz="-0.039 -0.015 -0.073" rpy="1.57 0 1.57"/>
+        </xacro:pacomeflex_gripper_finger>
+
+    </xacro:if>
+
+</robot>
